@@ -1,6 +1,8 @@
 package jatx.soxtest
 
 import android.Manifest
+import android.media.AudioAttributes
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -8,6 +10,7 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
@@ -46,6 +49,8 @@ class MainActivity : AppCompatActivity() {
 
     private val tmpFiles = arrayListOf<File>()
     private val appliedEffects = arrayListOf<AudioEffect>()
+
+    private var mediaPlayer: MediaPlayer? = null
 
     private var currentProjectFile: File? = null
         set(value) {
@@ -90,6 +95,16 @@ class MainActivity : AppCompatActivity() {
         binding.btnUndo.setOnClickListener {
             undoEffect()
         }
+
+        binding.btnPlay.setOnClickListener {
+            playResult()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
     }
 
     override fun onBackPressed() {
@@ -312,6 +327,26 @@ class MainActivity : AppCompatActivity() {
             withContext(Dispatchers.Main) {
                 setButtonsEnables(true)
             }
+        }
+    }
+
+    private fun playResult() {
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+
+        mediaPlayer = MediaPlayer().apply {
+            setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .build()
+            )
+        }
+
+        tmpFiles.lastOrNull()?.let { lastFile ->
+            mediaPlayer?.setDataSource(applicationContext, lastFile.toUri())
+            mediaPlayer?.prepare()
+            mediaPlayer?.start()
         }
     }
 

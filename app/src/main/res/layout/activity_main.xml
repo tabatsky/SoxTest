@@ -107,5 +107,14 @@
             android:theme="@style/AccentButton"
             style="@style/Widget.AppCompat.Button.Colored"
             />
+        <Button
+            android:id="@+id/btn_play"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Play"
+            android:theme="@style/AccentButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            />
     </LinearLayout>
 </LinearLayout>
