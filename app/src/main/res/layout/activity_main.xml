@@ -82,4 +82,15 @@
         android:theme="@style/AccentButton"
         style="@style/Widget.AppCompat.Button.Colored"
         />
+
+    <EditText
+        android:id="@+id/et_applied_effects"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:inputType="textMultiLine"
+        android:enabled="false"
+        android:gravity="top|start"
+        android:text=""
+        />
 </LinearLayout>

@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val tmpFiles = arrayListOf<File>()
+    private val appliedEffects = arrayListOf<AudioEffect>()
 
     private var currentProjectFile: File? = null
         set(value) {
@@ -94,6 +95,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun cleanProject() {
         tmpFiles.clear()
+        appliedEffects.clear()
         currentProjectFile = null
         outFile = null
         FileUtils.cleanDirectory(getProjectDir())
@@ -201,9 +203,9 @@ class MainActivity : AppCompatActivity() {
         performAsync {
             cleanProject()
             copyFileAndGetPath(uri)?.let { origPath ->
-                val tmpFile = generateTmpFileFromCurrentDate("wav")
-                convertAudioFileJNI(origPath, tmpFile.absolutePath)
-                tmpFiles.add(tmpFile)
+                val newFile = generateTmpFileFromCurrentDate("wav")
+                convertAudioFileJNI(origPath, newFile.absolutePath)
+                applyEffect(newFile, LoadFile(File(origPath)))
             }
         }
     }
@@ -261,7 +263,7 @@ class MainActivity : AppCompatActivity() {
             tmpFiles.lastOrNull()?.let { inFile ->
                 val newFile = generateTmpFileFromCurrentDate("wav")
                 applyTempoJNI(inFile.absolutePath, newFile.absolutePath, tempo.toString())
-                tmpFiles.add(newFile)
+                applyEffect(newFile, Tempo(tempo))
             }
         }
     }
@@ -271,9 +273,16 @@ class MainActivity : AppCompatActivity() {
             tmpFiles.lastOrNull()?.let { inFile ->
                 val newFile = generateTmpFileFromCurrentDate("wav")
                 applyReverseJNI(inFile.absolutePath, newFile.absolutePath)
-                tmpFiles.add(newFile)
+                applyEffect(newFile, Reverse)
             }
         }
+    }
+
+    private fun applyEffect(newFile: File, audioEffect: AudioEffect) {
+        tmpFiles.add(newFile)
+        appliedEffects.add(audioEffect)
+        val text = appliedEffects.reversed().joinToString(separator="\n") { it.description }
+        binding.etAppliedEffects.setText(text)
     }
 
     private fun performAsync(block: () -> Unit) {
