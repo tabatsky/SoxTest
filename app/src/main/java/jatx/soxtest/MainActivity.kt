@@ -131,7 +131,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun generateTmpFileFromCurrentDate(extension: String): File {
-        val sdf = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
+        val sdf = SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.getDefault())
         val dateStr = sdf.format(Date())
         val fileName = "${dateStr}.${extension}"
         return File(getProjectDir(), fileName)
