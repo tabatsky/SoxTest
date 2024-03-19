@@ -43,6 +43,10 @@ class MainActivity : AppCompatActivity() {
     private val tmpFiles = arrayListOf<File>()
 
     private var currentProjectFile: File? = null
+        set(value) {
+            field = value
+            binding.tvFileName.text = value?.name ?: ""
+        }
     private var outFile: File? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +64,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnSaveMp3.setOnClickListener {
             trySaveAudioFile("mp3")
+        }
+
+        binding.btnSaveFlac.setOnClickListener {
+            trySaveAudioFile("flac")
         }
 
         binding.btnApplyTempo.setOnClickListener {
@@ -92,6 +100,7 @@ class MainActivity : AppCompatActivity() {
     private fun setButtonsEnables(enabled: Boolean) {
         binding.btnLoadFile.isEnabled = enabled
         binding.btnSaveMp3.isEnabled = enabled
+        binding.btnSaveFlac.isEnabled = enabled
         binding.btnApplyTempo.isEnabled = enabled
         binding.btnApplyReverse.isEnabled = enabled
     }
