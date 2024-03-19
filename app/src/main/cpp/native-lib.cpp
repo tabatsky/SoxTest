@@ -3,7 +3,10 @@
 #include <cstring>
 #include <iostream>
 #include <assert.h>
+#include <android/log.h>
 #include "sox.h"
+
+#define APPNAME "SoxTest"
 
 void sox_convert(char* inPathCStr, char* outPathCStr);
 void sox_tempo(char* inPathCStr, char* outPathCStr, char* tempoCStr);
@@ -110,6 +113,8 @@ void sox_convert(char* inPathCStr, char* outPathCStr) {
     sox_close(out);
     sox_close(in);
     sox_quit();
+
+    __android_log_print(ANDROID_LOG_ERROR, APPNAME, "Convert done: %s; %s", inPathCStr, outPathCStr);
 }
 
 void sox_tempo(char* inPathCStr, char* outPathCStr, char* tempoCStr) {
@@ -168,6 +173,8 @@ void sox_tempo(char* inPathCStr, char* outPathCStr, char* tempoCStr) {
     sox_close(out);
     sox_close(in);
     sox_quit();
+
+    __android_log_print(ANDROID_LOG_ERROR, APPNAME, "Tempo done: %s", tempoCStr);
 }
 
 void sox_reverse(char* inPathCStr, char* outPathCStr) {
@@ -232,4 +239,6 @@ void sox_reverse(char* inPathCStr, char* outPathCStr) {
     sox_close(out);
     sox_close(in);
     sox_quit();
+
+    __android_log_print(ANDROID_LOG_ERROR, APPNAME, "Reverse done");
 }
