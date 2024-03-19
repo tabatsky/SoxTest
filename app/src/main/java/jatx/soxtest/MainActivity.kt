@@ -86,6 +86,10 @@ class MainActivity : AppCompatActivity() {
         binding.btnApplyReverse.setOnClickListener {
             applyReverse()
         }
+
+        binding.btnUndo.setOnClickListener {
+            undoEffect()
+        }
     }
 
     override fun onBackPressed() {
@@ -116,6 +120,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnSaveFlac.isEnabled = enabled
         binding.btnApplyTempo.isEnabled = enabled
         binding.btnApplyReverse.isEnabled = enabled
+        binding.btnUndo.isEnabled = enabled
     }
 
     private fun tryOpenAudioFile() {
@@ -281,6 +286,17 @@ class MainActivity : AppCompatActivity() {
     private fun applyEffect(newFile: File, audioEffect: AudioEffect) {
         tmpFiles.add(newFile)
         appliedEffects.add(audioEffect)
+        val text = appliedEffects.reversed().joinToString(separator="\n") { it.description }
+        binding.etAppliedEffects.setText(text)
+    }
+
+    private fun undoEffect() {
+        val lastEffect = appliedEffects.lastOrNull() ?: return
+        if (lastEffect is LoadFile) return
+        val lastFile = tmpFiles.lastOrNull() ?: return
+        FileUtils.delete(lastFile)
+        tmpFiles.removeLast()
+        appliedEffects.removeLast()
         val text = appliedEffects.reversed().joinToString(separator="\n") { it.description }
         binding.etAppliedEffects.setText(text)
     }

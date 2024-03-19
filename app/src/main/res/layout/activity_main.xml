@@ -93,4 +93,19 @@
         android:gravity="top|start"
         android:text=""
         />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btn_undo"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Undo"
+            android:theme="@style/AccentButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            />
+    </LinearLayout>
 </LinearLayout>
