@@ -8,9 +8,13 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import jatx.soxtest.databinding.ActivityMainBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.io.FileInputStream
@@ -112,7 +116,6 @@ class MainActivity : AppCompatActivity() {
     private fun trySaveAudioFile(extension: String) {
         tmpFiles.lastOrNull()?.let { lastFile ->
             outFile = generateTmpFileFromCurrentDate(extension)
-            convertAudioFileJNI(lastFile.absolutePath, outFile!!.absolutePath)
         }
         currentProjectFile?.let {
             val fileName = "${it.nameWithoutExtension}.${extension}"
@@ -150,6 +153,14 @@ class MainActivity : AppCompatActivity() {
         return newFile.absolutePath
     }
 
+    private fun convertLastFileToOutFile() {
+        tmpFiles.lastOrNull()?.let { lastFile ->
+            outFile?.let { theOutFile ->
+                convertAudioFileJNI(lastFile.absolutePath, theOutFile.absolutePath)
+            }
+        }
+    }
+
     private fun copyOutFileToUri(uri: Uri) {
         val outputStream = contentResolver.openOutputStream(uri)
         outFile?.let { theOutFile ->
@@ -168,14 +179,7 @@ class MainActivity : AppCompatActivity() {
     private fun tryLoadAudioFileFromUri(uri: Uri) {
         val permissionListener = object: PermissionListener {
             override fun onPermissionGranted() {
-                setButtonsEnables(false)
-                cleanProject()
-                copyFileAndGetPath(uri)?.let { origPath ->
-                    val tmpFile = generateTmpFileFromCurrentDate("wav")
-                    convertAudioFileJNI(origPath, tmpFile.absolutePath)
-                    tmpFiles.add(tmpFile)
-                }
-                setButtonsEnables(true)
+                loadAudioFileFromUri(uri)
             }
 
             override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
@@ -186,12 +190,21 @@ class MainActivity : AppCompatActivity() {
         checkMediaPermissions(permissionListener)
     }
 
+    private fun loadAudioFileFromUri(uri: Uri) {
+        performAsync {
+            cleanProject()
+            copyFileAndGetPath(uri)?.let { origPath ->
+                val tmpFile = generateTmpFileFromCurrentDate("wav")
+                convertAudioFileJNI(origPath, tmpFile.absolutePath)
+                tmpFiles.add(tmpFile)
+            }
+        }
+    }
+
     private fun trySaveAudioFileToUri(uri: Uri) {
         val permissionListener = object: PermissionListener {
             override fun onPermissionGranted() {
-                setButtonsEnables(false)
-                copyOutFileToUri(uri)
-                setButtonsEnables(true)
+                saveAudioFileToUri(uri)
             }
 
             override fun onPermissionDenied(deniedPermissions: MutableList<String>?) {
@@ -200,6 +213,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         checkMediaPermissions(permissionListener)
+    }
+
+    private fun saveAudioFileToUri(uri: Uri) {
+        performAsync {
+            convertLastFileToOutFile()
+            copyOutFileToUri(uri)
+        }
     }
 
     private fun checkMediaPermissions(permissionListener: PermissionListener) {
@@ -229,23 +249,37 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun applyTempo(tempo: Float) {
-        setButtonsEnables(false)
-        tmpFiles.lastOrNull()?.let { inFile ->
-            val newFile = generateTmpFileFromCurrentDate("wav")
-            applyTempoJNI(inFile.absolutePath, newFile.absolutePath, tempo.toString())
-            tmpFiles.add(newFile)
+        performAsync {
+            tmpFiles.lastOrNull()?.let { inFile ->
+                val newFile = generateTmpFileFromCurrentDate("wav")
+                applyTempoJNI(inFile.absolutePath, newFile.absolutePath, tempo.toString())
+                tmpFiles.add(newFile)
+            }
         }
-        setButtonsEnables(true)
     }
 
     private fun applyReverse() {
-        setButtonsEnables(false)
-        tmpFiles.lastOrNull()?.let { inFile ->
-            val newFile = generateTmpFileFromCurrentDate("wav")
-            applyReverseJNI(inFile.absolutePath, newFile.absolutePath)
-            tmpFiles.add(newFile)
+        performAsync {
+            tmpFiles.lastOrNull()?.let { inFile ->
+                val newFile = generateTmpFileFromCurrentDate("wav")
+                applyReverseJNI(inFile.absolutePath, newFile.absolutePath)
+                tmpFiles.add(newFile)
+            }
         }
-        setButtonsEnables(true)
+    }
+
+    private fun performAsync(block: () -> Unit) {
+        lifecycleScope.launch {
+            withContext(Dispatchers.Main) {
+                setButtonsEnables(false)
+            }
+            withContext(Dispatchers.IO) {
+                block.invoke()
+            }
+            withContext(Dispatchers.Main) {
+                setButtonsEnables(true)
+            }
+        }
     }
 
     /**
