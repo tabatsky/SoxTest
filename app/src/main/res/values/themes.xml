@@ -13,4 +13,9 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="AccentButton" parent="ThemeOverlay.AppCompat">
+        <item name="android:colorButtonNormal">@android:color/darker_gray</item>
+        <item name="colorAccent">@color/purple_700</item>
+    </style>
 </resources>
