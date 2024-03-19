@@ -99,6 +99,13 @@ class MainActivity : AppCompatActivity() {
         FileUtils.cleanDirectory(getProjectDir())
     }
 
+    private fun cleanOutFile() {
+        outFile?.let {
+            FileUtils.delete(it)
+        }
+        outFile = null
+    }
+
     private fun getProjectDir() = getExternalFilesDir(null)
 
     private fun setButtonsEnables(enabled: Boolean) {
@@ -219,6 +226,7 @@ class MainActivity : AppCompatActivity() {
         performAsync {
             convertLastFileToOutFile()
             copyOutFileToUri(uri)
+            cleanOutFile()
         }
     }
 
