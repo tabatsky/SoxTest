@@ -89,6 +89,13 @@ class MainActivity : AppCompatActivity() {
             applyTempo(tempo)
         }
 
+        binding.btnApplyPitch.setOnClickListener {
+            val pitch = binding.etPitch.text.toString()
+                .takeIf { it.isNotEmpty() }
+                ?.toInt() ?: 0
+            applyPitch(pitch)
+        }
+
         binding.btnApplyReverse.setOnClickListener {
             applyReverse()
         }
@@ -138,6 +145,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnSaveMp3.isEnabled = enabled
         binding.btnSaveFlac.isEnabled = enabled
         binding.btnApplyTempo.isEnabled = enabled
+        binding.btnApplyPitch.isEnabled = enabled
         binding.btnApplyReverse.isEnabled = enabled
         binding.btnUndo.isEnabled = enabled
     }
@@ -295,6 +303,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun applyPitch(pitch: Int) {
+        performAsync {
+            tmpFiles.lastOrNull()?.let { inFile ->
+                val newFile = generateTmpFileFromCurrentDate("wav")
+                applyPitchJNI(inFile.absolutePath, newFile.absolutePath, pitch.toString())
+                applyEffect(newFile, Pitch(pitch))
+            }
+        }
+    }
+
     private fun applyReverse() {
         performAsync {
             tmpFiles.lastOrNull()?.let { inFile ->
@@ -392,9 +410,8 @@ class MainActivity : AppCompatActivity() {
     external fun stringFromJNI(): String
 
     external fun convertAudioFileJNI(inPath: String, outPath: String)
-
     external fun applyTempoJNI(inPath: String, outPath: String, tempo: String)
-
+    external fun applyPitchJNI(inPath: String, outPath: String, pitch: String)
     external fun applyReverseJNI(inPath: String, outPath: String)
 
     companion object {

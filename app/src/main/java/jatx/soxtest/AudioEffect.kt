@@ -21,6 +21,13 @@ data class Tempo(
     override val fileNameModifier = "tempo_$tempo"
 }
 
+data class Pitch(
+    private val pitch: Int
+): AudioEffect() {
+    override val description = "pitch: $pitch"
+    override val fileNameModifier = "pitch_$pitch"
+}
+
 data object Reverse: AudioEffect() {
     override val description = "reverse"
     override val fileNameModifier = "reverse"

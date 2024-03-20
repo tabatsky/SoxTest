@@ -74,6 +74,29 @@
             />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/et_pitch"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned"
+            android:text="0"
+            />
+        <Button
+            android:id="@+id/btn_apply_pitch"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Apply Pitch"
+            android:theme="@style/AccentButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            />
+    </LinearLayout>
+
     <Button
         android:id="@+id/btn_apply_reverse"
         android:layout_width="match_parent"

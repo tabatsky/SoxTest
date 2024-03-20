@@ -10,6 +10,7 @@
 
 void sox_convert(char* inPathCStr, char* outPathCStr);
 void sox_tempo(char* inPathCStr, char* outPathCStr, char* tempoCStr);
+void sox_pitch(char* inPathCStr, char* outPathCStr, char* pitchCStr);
 void sox_reverse(char* inPathCStr, char* outPathCStr);
 
 extern "C" JNIEXPORT jstring JNICALL
@@ -48,6 +49,23 @@ Java_jatx_soxtest_MainActivity_applyTempoJNI(
     outPathCStr = (char*) env->GetStringUTFChars(outPath, NULL);
     tempoCStr = (char*) env->GetStringUTFChars(tempo, NULL);
     sox_tempo(inPathCStr, outPathCStr, tempoCStr);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_jatx_soxtest_MainActivity_applyPitchJNI(
+        JNIEnv* env,
+        jobject /* this */,
+        jstring inPath,
+        jstring outPath,
+        jstring pitch
+        ) {
+    char* inPathCStr;
+    char* outPathCStr;
+    char* pitchCStr;
+    inPathCStr = (char*) env->GetStringUTFChars(inPath, NULL);
+    outPathCStr = (char*) env->GetStringUTFChars(outPath, NULL);
+    pitchCStr = (char*) env->GetStringUTFChars(pitch, NULL);
+    sox_pitch(inPathCStr, outPathCStr, pitchCStr);
 }
 
 extern "C" JNIEXPORT void JNICALL
@@ -175,6 +193,66 @@ void sox_tempo(char* inPathCStr, char* outPathCStr, char* tempoCStr) {
     sox_quit();
 
     __android_log_print(ANDROID_LOG_ERROR, APPNAME, "Tempo done: %s", tempoCStr);
+}
+
+void sox_pitch(char* inPathCStr, char* outPathCStr, char* pitchCStr) {
+    static sox_format_t * in, * out; /* input and output files */
+    sox_effects_chain_t * chain;
+    sox_effect_t * e;
+    sox_signalinfo_t interm_signal;
+    char * args[10];
+
+    /* All libSoX applications must start by initialising the SoX library    */
+    assert(sox_init() == SOX_SUCCESS);
+
+    /* Open the input file (with default parameters) */
+    assert(in = sox_open_read(inPathCStr, NULL, NULL, NULL));
+
+    interm_signal = in->signal;
+
+    /* Open the output file; we must specify the output signal characteristics.
+    * Since we are using only simple effects, they are the same as the input
+    * file characteristics */
+    assert(out = sox_open_write(outPathCStr, &interm_signal, NULL, NULL, NULL, NULL));
+
+    /* Create an effects chain; some effects need to know about the input
+    * or output file encoding so we provide that information here */
+    chain = sox_create_effects_chain(&in->encoding, &out->encoding);
+
+    /* The first effect in the effect chain must be something that can source
+    * samples; in this case, we use the built-in handler that inputs
+    * data from an audio file */
+    e = sox_create_effect(sox_find_effect("input"));
+    args[0] = (char *)in, assert(sox_effect_options(e, 1, args) == SOX_SUCCESS);
+    /* This becomes the first `effect' in the chain */
+    assert(sox_add_effect(chain, e, &interm_signal, &interm_signal) == SOX_SUCCESS);
+    free(e);
+
+    /* Create the `tempo' effect, and initialise it with the desired parameters: */
+    e = sox_create_effect(sox_find_effect("pitch"));
+    args[0] = pitchCStr, assert(sox_effect_options(e, 1, args) == SOX_SUCCESS);
+    /* Add the effect to the end of the effects processing chain: */
+    assert(sox_add_effect(chain, e, &interm_signal, &interm_signal) == SOX_SUCCESS);
+    free(e);
+
+    /* The last effect in the effect chain must be something that only consumes
+    * samples; in this case, we use the built-in handler that outputs
+    * data to an audio file */
+    e = sox_create_effect(sox_find_effect("output"));
+    args[0] = (char *)out, assert(sox_effect_options(e, 1, args) == SOX_SUCCESS);
+    assert(sox_add_effect(chain, e, &interm_signal, &interm_signal) == SOX_SUCCESS);
+    free(e);
+
+    /* Flow samples through the effects processing chain until EOF is reached */
+    sox_flow_effects(chain, NULL, NULL);
+
+    /* All done; tidy up: */
+    sox_delete_effects_chain(chain);
+    sox_close(out);
+    sox_close(in);
+    sox_quit();
+
+    __android_log_print(ANDROID_LOG_ERROR, APPNAME, "Pitch done: %s", pitchCStr);
 }
 
 void sox_reverse(char* inPathCStr, char* outPathCStr) {
