@@ -146,8 +146,11 @@ class MainActivity : AppCompatActivity() {
         tmpFiles.lastOrNull()?.let { lastFile ->
             outFile = generateTmpFileFromCurrentDate(extension)
         }
-        currentProjectFile?.let {
-            val fileName = "${it.nameWithoutExtension}.${extension}"
+        currentProjectFile?.let {theCurrentProjectFile ->
+            val fileNameParts = listOf(theCurrentProjectFile.nameWithoutExtension) +
+                    appliedEffects.drop(1).map { it.fileNameModifier }
+            val fileNameWithoutExtension = fileNameParts.joinToString("_")
+            val fileName = "${fileNameWithoutExtension}.$extension"
             saveAudioFileLauncher.launch(fileName)
         }
     }
