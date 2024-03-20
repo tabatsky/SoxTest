@@ -298,7 +298,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun applyEffect(newFile: File, audioEffect: AudioEffect) {
+    private suspend fun applyEffect(newFile: File, audioEffect: AudioEffect) = withContext(Dispatchers.Main) {
         tmpFiles.add(newFile)
         appliedEffects.add(audioEffect)
         val text = appliedEffects.reversed().joinToString(separator="\n") { it.description }
@@ -316,7 +316,7 @@ class MainActivity : AppCompatActivity() {
         binding.etAppliedEffects.setText(text)
     }
 
-    private fun performAsync(block: () -> Unit) {
+    private fun performAsync(block: suspend () -> Unit) {
         lifecycleScope.launch {
             withContext(Dispatchers.Main) {
                 setButtonsEnables(false)
