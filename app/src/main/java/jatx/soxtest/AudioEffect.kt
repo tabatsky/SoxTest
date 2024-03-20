@@ -3,7 +3,7 @@ package jatx.soxtest
 import java.io.File
 
 sealed class AudioEffect {
-    open val description: String = "audio effect"
+    abstract val description: String
 }
 
 data class LoadFile(
