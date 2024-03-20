@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
@@ -99,12 +100,15 @@ class MainActivity : AppCompatActivity() {
         binding.btnPlay.setOnClickListener {
             playResult()
         }
+
+        binding.btnPause.setOnClickListener {
+            pausePlayer()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer?.stop()
-        mediaPlayer?.release()
+        stopAndReleasePlayer()
     }
 
     override fun onBackPressed() {
@@ -306,12 +310,17 @@ class MainActivity : AppCompatActivity() {
         appliedEffects.add(audioEffect)
         val text = appliedEffects.reversed().joinToString(separator="\n") { it.description }
         binding.etAppliedEffects.setText(text)
+
+        stopAndReleasePlayer()
     }
 
     private fun undoEffect() {
         val lastEffect = appliedEffects.lastOrNull() ?: return
         if (lastEffect is LoadFile) return
         val lastFile = tmpFiles.lastOrNull() ?: return
+
+        stopAndReleasePlayer()
+
         FileUtils.delete(lastFile)
         tmpFiles.removeLast()
         appliedEffects.removeLast()
@@ -334,23 +343,46 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun playResult() {
-        mediaPlayer?.stop()
-        mediaPlayer?.release()
+        if (mediaPlayer == null) {
+            mediaPlayer = MediaPlayer().apply {
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )
+            }
 
-        mediaPlayer = MediaPlayer().apply {
-            setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                    .build()
-            )
-        }
-
-        tmpFiles.lastOrNull()?.let { lastFile ->
-            mediaPlayer?.setDataSource(applicationContext, lastFile.toUri())
-            mediaPlayer?.prepare()
+            tmpFiles.lastOrNull()?.let { lastFile ->
+                mediaPlayer?.setDataSource(applicationContext, lastFile.toUri())
+                mediaPlayer?.prepare()
+                mediaPlayer?.setOnCompletionListener {
+                    stopAndReleasePlayer()
+                }
+                mediaPlayer?.start()
+            }
+        } else {
             mediaPlayer?.start()
         }
+
+        binding.btnPlay.visibility = View.GONE
+        binding.btnPause.visibility = View.VISIBLE
+    }
+
+    private fun stopAndReleasePlayer() {
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
+
+        binding.btnPlay.visibility = View.VISIBLE
+        binding.btnPause.visibility = View.GONE
+    }
+
+    private fun pausePlayer() {
+        mediaPlayer?.pause()
+
+        binding.btnPlay.visibility = View.VISIBLE
+        binding.btnPause.visibility = View.GONE
     }
 
     /**

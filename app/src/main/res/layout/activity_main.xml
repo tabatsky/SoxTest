@@ -116,5 +116,15 @@
             android:theme="@style/AccentButton"
             style="@style/Widget.AppCompat.Button.Colored"
             />
+        <Button
+            android:id="@+id/btn_pause"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Pause"
+            android:visibility="gone"
+            android:theme="@style/AccentButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            />
     </LinearLayout>
 </LinearLayout>
