@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +19,7 @@ import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.normal.TedPermission
 import jatx.soxtest.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.apache.commons.io.FileUtils
@@ -112,6 +114,18 @@ class MainActivity : AppCompatActivity() {
         binding.btnPause.setOnClickListener {
             pausePlayer()
         }
+
+        val seekBarListener = object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    mediaPlayer?.seekTo(progress)
+                }
+            }
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        }
+
+        binding.seekBar.setOnSeekBarChangeListener(seekBarListener)
     }
 
     override fun onDestroy() {
@@ -427,10 +441,20 @@ class MainActivity : AppCompatActivity() {
                 mediaPlayer?.setOnCompletionListener {
                     stopAndReleasePlayer()
                 }
+                binding.seekBar.max = mediaPlayer?.duration ?: 0
                 mediaPlayer?.start()
             }
         } else {
             mediaPlayer?.start()
+        }
+
+        lifecycleScope.launch {
+            while (mediaPlayer?.isPlaying == true) {
+                delay(50L)
+                withContext(Dispatchers.Main) {
+                    binding.seekBar.progress = mediaPlayer?.currentPosition ?: 0
+                }
+            }
         }
 
         binding.btnPlay.visibility = View.GONE
