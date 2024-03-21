@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
@@ -197,12 +198,24 @@ class MainActivity : AppCompatActivity() {
         return newFile.absolutePath
     }
 
-    private fun convertLastFileToOutFile() {
+    private suspend fun convertLastFileToOutFile(): Boolean {
         tmpFiles.lastOrNull()?.let { lastFile ->
             outFile?.let { theOutFile ->
-                convertAudioFileJNI(lastFile.absolutePath, theOutFile.absolutePath)
+                val result = convertAudioFileJNI(lastFile.absolutePath, theOutFile.absolutePath)
+                if (result == 0) {
+                    withContext(Dispatchers.Main) {
+                        showToast("success")
+                    }
+                    return true
+                } else {
+                    withContext(Dispatchers.Main) {
+                        showToast("an error occured")
+                    }
+                    return false
+                }
             }
         }
+        return false
     }
 
     private fun copyOutFileToUri(uri: Uri) {
@@ -239,8 +252,17 @@ class MainActivity : AppCompatActivity() {
             cleanProject()
             copyFileAndGetPath(uri)?.let { origPath ->
                 val newFile = generateTmpFileFromCurrentDate("wav")
-                convertAudioFileJNI(origPath, newFile.absolutePath)
-                applyEffect(newFile, LoadFile(File(origPath)))
+                val result = convertAudioFileJNI(origPath, newFile.absolutePath)
+                if (result == 0) {
+                    applyEffect(newFile, LoadFile(File(origPath)))
+                    withContext(Dispatchers.Main) {
+                        showToast("success")
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        showToast("an error occured")
+                    }
+                }
             }
         }
     }
@@ -261,9 +283,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun saveAudioFileToUri(uri: Uri) {
         performAsync {
-            convertLastFileToOutFile()
-            copyOutFileToUri(uri)
-            cleanOutFile()
+            if (convertLastFileToOutFile()) {
+                copyOutFileToUri(uri)
+                cleanOutFile()
+            }
         }
     }
 
@@ -297,8 +320,17 @@ class MainActivity : AppCompatActivity() {
         performAsync {
             tmpFiles.lastOrNull()?.let { inFile ->
                 val newFile = generateTmpFileFromCurrentDate("wav")
-                applyTempoJNI(inFile.absolutePath, newFile.absolutePath, tempo.toString())
-                applyEffect(newFile, Tempo(tempo))
+                val result = applyTempoJNI(inFile.absolutePath, newFile.absolutePath, tempo.toString())
+                if (result == 0) {
+                    applyEffect(newFile, Tempo(tempo))
+                    withContext(Dispatchers.Main) {
+                        showToast("success")
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        showToast("an error occured")
+                    }
+                }
             }
         }
     }
@@ -307,8 +339,17 @@ class MainActivity : AppCompatActivity() {
         performAsync {
             tmpFiles.lastOrNull()?.let { inFile ->
                 val newFile = generateTmpFileFromCurrentDate("wav")
-                applyPitchJNI(inFile.absolutePath, newFile.absolutePath, pitch.toString())
-                applyEffect(newFile, Pitch(pitch))
+                val result = applyPitchJNI(inFile.absolutePath, newFile.absolutePath, pitch.toString())
+                if (result == 0) {
+                    applyEffect(newFile, Pitch(pitch))
+                    withContext(Dispatchers.Main) {
+                        showToast("success")
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        showToast("an error occured")
+                    }
+                }
             }
         }
     }
@@ -317,8 +358,17 @@ class MainActivity : AppCompatActivity() {
         performAsync {
             tmpFiles.lastOrNull()?.let { inFile ->
                 val newFile = generateTmpFileFromCurrentDate("wav")
-                applyReverseJNI(inFile.absolutePath, newFile.absolutePath)
-                applyEffect(newFile, Reverse)
+                val result = applyReverseJNI(inFile.absolutePath, newFile.absolutePath)
+                if (result == 0) {
+                    applyEffect(newFile, Reverse)
+                    withContext(Dispatchers.Main) {
+                        showToast("success")
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        showToast("an error occured")
+                    }
+                }
             }
         }
     }
@@ -403,16 +453,20 @@ class MainActivity : AppCompatActivity() {
         binding.btnPause.visibility = View.GONE
     }
 
+    private fun showToast(msg: String) {
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+    }
+
     /**
      * A native method that is implemented by the 'soxtest' native library,
      * which is packaged with this application.
      */
     external fun stringFromJNI(): String
 
-    external fun convertAudioFileJNI(inPath: String, outPath: String)
-    external fun applyTempoJNI(inPath: String, outPath: String, tempo: String)
-    external fun applyPitchJNI(inPath: String, outPath: String, pitch: String)
-    external fun applyReverseJNI(inPath: String, outPath: String)
+    external fun convertAudioFileJNI(inPath: String, outPath: String): Int
+    external fun applyTempoJNI(inPath: String, outPath: String, tempo: String): Int
+    external fun applyPitchJNI(inPath: String, outPath: String, pitch: String): Int
+    external fun applyReverseJNI(inPath: String, outPath: String): Int
 
     companion object {
         // Used to load the 'soxtest' library on application startup.
