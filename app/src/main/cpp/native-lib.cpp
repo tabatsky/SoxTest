@@ -1,12 +1,12 @@
 #include <jni.h>
 #include <string>
 #include <cstring>
-#include <iostream>
-#include <assert.h>
 #include <android/log.h>
 #include "sox.h"
 
 #define APPNAME "SoxTest"
+
+#define TMP_PATH "/sdcard/Android/data/jatx.soxtest/files"
 
 #define RESULT_SUCCESS 0
 #define RESULT_ERROR -1
@@ -126,7 +126,7 @@ int sox_convert(char* inPathCStr, char* outPathCStr) {
         return RESULT_ERROR;
     }
     /* This becomes the first `effect' in the chain */
-    if(sox_add_effect(chain, e, &interm_signal, &interm_signal) != SOX_SUCCESS) {
+    if(sox_add_effect(chain, e, &interm_signal, &in->signal) != SOX_SUCCESS) {
         return RESULT_ERROR;
     }
     free(e);
@@ -139,7 +139,7 @@ int sox_convert(char* inPathCStr, char* outPathCStr) {
     if(sox_effect_options(e, 1, args) != SOX_SUCCESS) {
         return RESULT_ERROR;
     }
-    if(sox_add_effect(chain, e, &interm_signal, &interm_signal) != SOX_SUCCESS) {
+    if(sox_add_effect(chain, e, &interm_signal, &out->signal) != SOX_SUCCESS) {
         return RESULT_ERROR;
     }
     free(e);
@@ -199,7 +199,7 @@ int sox_tempo(char* inPathCStr, char* outPathCStr, char* tempoCStr) {
         return RESULT_ERROR;
     }
     /* This becomes the first `effect' in the chain */
-    if(sox_add_effect(chain, e, &interm_signal, &interm_signal) != SOX_SUCCESS) {
+    if(sox_add_effect(chain, e, &interm_signal, &in->signal) != SOX_SUCCESS) {
         return RESULT_ERROR;
     }
     free(e);
@@ -211,7 +211,7 @@ int sox_tempo(char* inPathCStr, char* outPathCStr, char* tempoCStr) {
         return RESULT_ERROR;
     }
     /* Add the effect to the end of the effects processing chain: */
-    if(sox_add_effect(chain, e, &interm_signal, &interm_signal) != SOX_SUCCESS) {
+    if(sox_add_effect(chain, e, &interm_signal, &out->signal) != SOX_SUCCESS) {
         return RESULT_ERROR;
     }
     free(e);
@@ -224,7 +224,7 @@ int sox_tempo(char* inPathCStr, char* outPathCStr, char* tempoCStr) {
     if(sox_effect_options(e, 1, args) != SOX_SUCCESS) {
         return RESULT_ERROR;
     }
-    if(sox_add_effect(chain, e, &interm_signal, &interm_signal) != SOX_SUCCESS) {
+    if(sox_add_effect(chain, e, &interm_signal, &out->signal) != SOX_SUCCESS) {
         return RESULT_ERROR;
     }
     free(e);
@@ -345,8 +345,7 @@ int sox_reverse(char* inPathCStr, char* outPathCStr) {
     sox_signalinfo_t interm_signal;
     char * args[10];
 
-    char * tmp_path = "/sdcard/Android/data/jatx.soxtest/files";
-    sox_globals.tmp_path = tmp_path;
+    sox_globals.tmp_path = TMP_PATH;
 
     /* All libSoX applications must start by initialising the SoX library    */
     if(sox_init() != SOX_SUCCESS) {
@@ -382,7 +381,7 @@ int sox_reverse(char* inPathCStr, char* outPathCStr) {
         return RESULT_ERROR;
     }
     /* This becomes the first `effect' in the chain */
-    if(sox_add_effect(chain, e, &interm_signal, &interm_signal) != SOX_SUCCESS) {
+    if(sox_add_effect(chain, e, &interm_signal, &in->signal) != SOX_SUCCESS) {
         return RESULT_ERROR;
     }
     free(e);
@@ -393,7 +392,7 @@ int sox_reverse(char* inPathCStr, char* outPathCStr) {
         return RESULT_ERROR;
     }
     /* Add the effect to the end of the effects processing chain: */
-    if(sox_add_effect(chain, e, &interm_signal, &interm_signal) != SOX_SUCCESS) {
+    if(sox_add_effect(chain, e, &interm_signal, &out->signal) != SOX_SUCCESS) {
         return RESULT_ERROR;
     }
     free(e);
@@ -406,7 +405,7 @@ int sox_reverse(char* inPathCStr, char* outPathCStr) {
     if(sox_effect_options(e, 1, args) != SOX_SUCCESS) {
         return RESULT_ERROR;
     }
-    if(sox_add_effect(chain, e, &interm_signal, &interm_signal) != SOX_SUCCESS) {
+    if(sox_add_effect(chain, e, &interm_signal, &out->signal) != SOX_SUCCESS) {
         return RESULT_ERROR;
     }
     free(e);
