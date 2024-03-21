@@ -284,7 +284,7 @@ int sox_pitch(char* inPathCStr, char* outPathCStr, char* pitchCStr) {
         return RESULT_ERROR;
     }
     /* This becomes the first `effect' in the chain */
-    if(sox_add_effect(chain, e, &interm_signal, &interm_signal) != SOX_SUCCESS) {
+    if(sox_add_effect(chain, e, &interm_signal, &in->signal) != SOX_SUCCESS) {
         return RESULT_ERROR;
     }
     free(e);
@@ -296,7 +296,17 @@ int sox_pitch(char* inPathCStr, char* outPathCStr, char* pitchCStr) {
         return RESULT_ERROR;
     }
     /* Add the effect to the end of the effects processing chain: */
-    if(sox_add_effect(chain, e, &interm_signal, &interm_signal) != SOX_SUCCESS) {
+    if(sox_add_effect(chain, e, &interm_signal, &out->signal) != SOX_SUCCESS) {
+        return RESULT_ERROR;
+    }
+    free(e);
+
+    e = sox_create_effect(sox_find_effect("rate"));
+    args[0] = "-m";
+    if(sox_effect_options(e, 1, args) != SOX_SUCCESS) {
+        return RESULT_ERROR;
+    }
+    if(sox_add_effect(chain, e, &interm_signal, &out->signal) != SOX_SUCCESS) {
         return RESULT_ERROR;
     }
     free(e);
@@ -309,7 +319,7 @@ int sox_pitch(char* inPathCStr, char* outPathCStr, char* pitchCStr) {
     if(sox_effect_options(e, 1, args) != SOX_SUCCESS) {
         return RESULT_ERROR;
     }
-    if(sox_add_effect(chain, e, &interm_signal, &interm_signal) != SOX_SUCCESS) {
+    if(sox_add_effect(chain, e, &interm_signal, &out->signal) != SOX_SUCCESS) {
         return RESULT_ERROR;
     }
     free(e);
