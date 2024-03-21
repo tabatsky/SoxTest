@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         ActivityResultContracts.OpenDocument()
     ) { uri ->
         uri?.let { theUri ->
-           tryLoadAudioFileFromUri(theUri)
+           loadAudioFileFromUri(theUri)
         }
     }
 
@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
         ActivityResultContracts.CreateDocument("*/*")
     ) { uri ->
         uri?.let { theUri ->
-            trySaveAudioFileToUri(theUri)
+            saveAudioFileToUri(theUri)
         }
     }
 
