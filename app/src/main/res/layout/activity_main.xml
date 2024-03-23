@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -18,7 +17,7 @@
         android:id="@+id/btn_load_file"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Load File"
+        android:text="@string/label_btn_load_file"
         android:theme="@style/AccentButton"
         style="@style/Widget.AppCompat.Button.Colored"
         />
@@ -32,7 +31,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="Save File as MP3"
+            android:text="@string/label_btn_save_file_as_mp3"
             android:theme="@style/AccentButton"
             style="@style/Widget.AppCompat.Button.Colored"
             />
@@ -45,7 +44,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="Save File as FLAC"
+            android:text="@string/label_btn_save_file_as_flac"
             android:theme="@style/AccentButton"
             style="@style/Widget.AppCompat.Button.Colored"
             />
@@ -61,14 +60,15 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:inputType="numberDecimal"
-            android:text="1.0"
+            android:hint="@string/hint_et_tempo"
+            android:text="@string/initial_value_et_tempo"
             />
         <Button
             android:id="@+id/btn_apply_tempo"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Apply Tempo"
+            android:text="@string/label_btn_apply_tempo"
             android:theme="@style/AccentButton"
             style="@style/Widget.AppCompat.Button.Colored"
             />
@@ -84,14 +84,15 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:inputType="numberSigned"
-            android:text="0"
+            android:hint="@string/hint_et_pitch"
+            android:text="@string/initial_value_et_pitch"
             />
         <Button
             android:id="@+id/btn_apply_pitch"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Apply Pitch"
+            android:text="@string/label_btn_apply_pitch"
             android:theme="@style/AccentButton"
             style="@style/Widget.AppCompat.Button.Colored"
             />
@@ -101,7 +102,7 @@
         android:id="@+id/btn_apply_reverse"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Apply Reverse"
+        android:text="@string/label_btn_apply_reverse"
         android:theme="@style/AccentButton"
         style="@style/Widget.AppCompat.Button.Colored"
         />
@@ -132,7 +133,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Undo"
+            android:text="@string/label_btn_undo"
             android:theme="@style/AccentButton"
             style="@style/Widget.AppCompat.Button.Colored"
             />
@@ -141,7 +142,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Play"
+            android:text="@string/label_btn_play"
             android:theme="@style/AccentButton"
             style="@style/Widget.AppCompat.Button.Colored"
             />
@@ -150,7 +151,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Pause"
+            android:text="@string/label_btn_pause"
             android:visibility="gone"
             android:theme="@style/AccentButton"
             style="@style/Widget.AppCompat.Button.Colored"

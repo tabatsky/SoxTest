@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">SoxTest</string>
+    <string name="label_btn_load_file">Load File</string>
+    <string name="label_btn_save_file_as_flac">Save File as FLAC</string>
+    <string name="label_btn_save_file_as_mp3">Save File as MP3</string>
+    <string name="label_btn_apply_tempo">Apply Tempo</string>
+    <string name="label_btn_apply_pitch">Apply Pitch</string>
+    <string name="label_btn_apply_reverse">Apply Reverse</string>
+    <string name="label_btn_undo">Undo</string>
+    <string name="label_btn_play">Play</string>
+    <string name="label_btn_pause">Pause</string>
+    <string name="initial_value_et_tempo">1.0</string>
+    <string name="initial_value_et_pitch">0</string>
+    <string name="hint_et_pitch">Pitch</string>
+    <string name="hint_et_tempo">Tempo</string>
 </resources>
