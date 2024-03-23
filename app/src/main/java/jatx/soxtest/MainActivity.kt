@@ -189,12 +189,20 @@ class MainActivity : AppCompatActivity() {
         return File(getProjectDir(), fileName)
     }
 
-    private fun copyFileAndGetPath(uri: Uri): String? {
+    private suspend fun copyFileAndGetPath(uri: Uri): String? {
         val cursor = contentResolver.query(uri, null, null, null, null) ?: return null
         val columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
         cursor.moveToFirst()
         val displayName = cursor.getString(columnIndex)
         cursor.close()
+
+        val extension = displayName?.split(".")?.lastOrNull() ?: ""
+        if (extension !in listOf("mp3", "flac")) {
+            withContext(Dispatchers.Main) {
+                showToast("unsupported audio format")
+            }
+            return null
+        }
 
         val inputStream = contentResolver.openInputStream(uri)
         val newFile = File(getProjectDir(), displayName)
