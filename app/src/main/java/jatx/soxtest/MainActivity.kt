@@ -61,6 +61,14 @@ class MainActivity : AppCompatActivity() {
             field = value
             binding.tvFileName.text = value?.name ?: ""
         }
+    private var currentTrack: Track? = null
+        set(value) {
+            field = value
+            binding.tvArtist.text = "Artist: ${value?.artist ?: ""}"
+            binding.tvAlbum.text = "Album: ${value?.album ?: ""}"
+            binding.tvTitle.text = "Title: ${value?.title ?: ""}"
+        }
+
     private var outFile: File? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -216,6 +224,8 @@ class MainActivity : AppCompatActivity() {
 
         tmpFiles.add(newFile)
         currentProjectFile = newFile
+
+        currentTrack = Track().tryToFill(newFile)
 
         return newFile.absolutePath
     }
