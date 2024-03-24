@@ -23,9 +23,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.apache.commons.io.FileUtils
+import org.jaudiotagger.audio.AudioFileIO
+import org.jaudiotagger.audio.flac.FlacTagWriter
+import org.jaudiotagger.audio.mp3.MP3File
+import org.jaudiotagger.tag.FieldKey
+import org.jaudiotagger.tag.flac.FlacTag
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.RandomAccessFile
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -238,6 +244,7 @@ class MainActivity : AppCompatActivity() {
                     withContext(Dispatchers.Main) {
                         showToast("success")
                     }
+                    trySaveTags()
                     return true
                 } else {
                     withContext(Dispatchers.Main) {
@@ -493,6 +500,67 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnPlay.visibility = View.VISIBLE
         binding.btnPause.visibility = View.GONE
+    }
+
+    private suspend fun trySaveTags() {
+        try {
+            when (outFile?.extension) {
+                "mp3" -> {
+                    saveMP3Tags()
+                }
+                "flac" -> {
+                    saveFLACTags()
+                }
+            }
+        } catch (e: Throwable) {
+            Log.e("error", "save tags", e)
+            withContext(Dispatchers.Main) {
+                showToast("an error occured")
+            }
+            showToast("an error occured")
+        }
+    }
+
+    private fun saveMP3Tags() {
+        outFile?.let { file ->
+
+            val mp3f = MP3File(file)
+            val tag = mp3f.createDefaultTag()
+
+            currentTrack?.let {
+                val artist = "SoxTest"
+                val title = "${it.title} (${it.artist} Cover)"
+                tag.setField(FieldKey.ARTIST, artist)
+                tag.setField(FieldKey.ALBUM_ARTIST, artist)
+                tag.setField(FieldKey.ALBUM, it.album)
+                tag.setField(FieldKey.TITLE, title)
+                tag.setField(FieldKey.YEAR, it.year)
+                tag.setField(FieldKey.COMMENT, "tag created with SoxTest")
+
+                mp3f.tag = tag
+                mp3f.save(file)
+            }
+        }
+    }
+
+    private fun saveFLACTags() {
+        outFile?.let { file ->
+            val af = AudioFileIO.read(file)
+            val tag = af.tagOrCreateDefault as FlacTag
+            currentTrack?.let {
+                val artist = "SoxTest"
+                val title = "${it.title} (${it.artist} Cover)"
+                tag.setField(FieldKey.ARTIST, artist)
+                tag.setField(FieldKey.ALBUM_ARTIST, artist)
+                tag.setField(FieldKey.ALBUM, it.album)
+                tag.setField(FieldKey.TITLE, title)
+                tag.setField(FieldKey.YEAR, it.year)
+                tag.setField(FieldKey.COMMENT, "tag created with SoxTest")
+
+                val raf = RandomAccessFile(file, "rw")
+                FlacTagWriter().write(tag, raf, raf)
+            }
+        }
     }
 
     private fun showToast(msg: String) {
