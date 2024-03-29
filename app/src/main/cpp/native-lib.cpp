@@ -32,9 +32,13 @@ Java_jatx_soxtest_MainActivity_convertAudioFileJNI(
         jstring outPath) {
     char* inPathCStr;
     char* outPathCStr;
+    int result;
     inPathCStr = (char*) env->GetStringUTFChars(inPath, NULL);
     outPathCStr = (char*) env->GetStringUTFChars(outPath, NULL);
-    return sox_convert(inPathCStr, outPathCStr);
+    result = sox_convert(inPathCStr, outPathCStr);
+    env->ReleaseStringUTFChars(inPath, inPathCStr);
+    env->ReleaseStringUTFChars(outPath, outPathCStr);
+    return result;
 }
 
 extern "C" JNIEXPORT int JNICALL
@@ -48,10 +52,15 @@ Java_jatx_soxtest_MainActivity_applyTempoJNI(
     char* inPathCStr;
     char* outPathCStr;
     char* tempoCStr;
+    int result;
     inPathCStr = (char*) env->GetStringUTFChars(inPath, NULL);
     outPathCStr = (char*) env->GetStringUTFChars(outPath, NULL);
     tempoCStr = (char*) env->GetStringUTFChars(tempo, NULL);
-    return sox_tempo(inPathCStr, outPathCStr, tempoCStr);
+    result = sox_tempo(inPathCStr, outPathCStr, tempoCStr);
+    env->ReleaseStringUTFChars(inPath, inPathCStr);
+    env->ReleaseStringUTFChars(outPath, outPathCStr);
+    env->ReleaseStringUTFChars(tempo, tempoCStr);
+    return result;
 }
 
 extern "C" JNIEXPORT int JNICALL
@@ -65,10 +74,15 @@ Java_jatx_soxtest_MainActivity_applyPitchJNI(
     char* inPathCStr;
     char* outPathCStr;
     char* pitchCStr;
+    int result;
     inPathCStr = (char*) env->GetStringUTFChars(inPath, NULL);
     outPathCStr = (char*) env->GetStringUTFChars(outPath, NULL);
     pitchCStr = (char*) env->GetStringUTFChars(pitch, NULL);
-    return sox_pitch(inPathCStr, outPathCStr, pitchCStr);
+    result = sox_pitch(inPathCStr, outPathCStr, pitchCStr);
+    env->ReleaseStringUTFChars(inPath, inPathCStr);
+    env->ReleaseStringUTFChars(outPath, outPathCStr);
+    env->ReleaseStringUTFChars(pitch, pitchCStr);
+    return result;
 }
 
 extern "C" JNIEXPORT int JNICALL
@@ -80,9 +94,13 @@ Java_jatx_soxtest_MainActivity_applyReverseJNI(
         ) {
     char* inPathCStr;
     char* outPathCStr;
+    int result;
     inPathCStr = (char*) env->GetStringUTFChars(inPath, NULL);
     outPathCStr = (char*) env->GetStringUTFChars(outPath, NULL);
-    return sox_reverse(inPathCStr, outPathCStr);
+    result = sox_reverse(inPathCStr, outPathCStr);
+    env->ReleaseStringUTFChars(inPath, inPathCStr);
+    env->ReleaseStringUTFChars(outPath, outPathCStr);
+    return result;
 }
 
 int sox_convert(char* inPathCStr, char* outPathCStr) {
