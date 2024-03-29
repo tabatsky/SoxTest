@@ -69,6 +69,19 @@
             android:theme="@style/AccentButton"
             style="@style/Widget.AppCompat.Button.Colored"
             />
+        <View
+            android:layout_width="10dp"
+            android:layout_height="match_parent"
+            />
+        <Button
+            android:id="@+id/btn_save_ogg"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="@string/label_btn_save_file_as_ogg"
+            android:theme="@style/AccentButton"
+            style="@style/Widget.AppCompat.Button.Colored"
+            />
     </LinearLayout>
 
     <LinearLayout

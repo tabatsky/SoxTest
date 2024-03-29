@@ -98,6 +98,10 @@ class MainActivity : AppCompatActivity() {
             trySaveAudioFile("flac")
         }
 
+        binding.btnSaveOgg.setOnClickListener {
+            trySaveAudioFile("ogg")
+        }
+
         binding.btnApplyTempo.setOnClickListener {
             val tempo = binding.etTempo.text.toString()
                 .takeIf { it.isNotEmpty() }
@@ -173,6 +177,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnLoadFile.isEnabled = enabled
         binding.btnSaveMp3.isEnabled = enabled
         binding.btnSaveFlac.isEnabled = enabled
+        binding.btnSaveOgg.isEnabled = enabled
         binding.btnApplyTempo.isEnabled = enabled
         binding.btnApplyPitch.isEnabled = enabled
         binding.btnApplyReverse.isEnabled = enabled
@@ -211,7 +216,7 @@ class MainActivity : AppCompatActivity() {
         cursor.close()
 
         val extension = displayName?.split(".")?.lastOrNull() ?: ""
-        if (extension !in listOf("mp3", "flac")) {
+        if (extension !in listOf("mp3", "flac", "ogg")) {
             withContext(Dispatchers.Main) {
                 showToast("unsupported audio format")
             }

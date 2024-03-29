@@ -29,6 +29,7 @@ data class Track(
                 "flac" -> {
                     fillFromFLACFile(af)
                 }
+                "ogg" -> Track()
                 else -> {
                     throw IllegalStateException("wrong file extension")
                 }

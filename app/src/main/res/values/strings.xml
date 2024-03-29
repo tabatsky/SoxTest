@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">SoxTest</string>
     <string name="label_btn_load_file">Load File</string>
-    <string name="label_btn_save_file_as_flac">Save File as FLAC</string>
-    <string name="label_btn_save_file_as_mp3">Save File as MP3</string>
+    <string name="label_btn_save_file_as_flac">Save as FLAC</string>
+    <string name="label_btn_save_file_as_mp3">Save as MP3</string>
+    <string name="label_btn_save_file_as_ogg">Save as OGG</string>
     <string name="label_btn_apply_tempo">Apply Tempo</string>
     <string name="label_btn_apply_pitch">Apply Pitch</string>
     <string name="label_btn_apply_reverse">Apply Reverse</string>
